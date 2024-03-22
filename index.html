@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Names Generator</title>
+</head>
+<body>
+    <label for="actionName">1:</label>
+    <input type="text" id="actionName" placeholder="Promo Name" onkeydown="handleKeyDown(event, 'actionName')"><br>
+    <label for="quizName">2:</label>
+    <input style="margin-top: 20px;" type="text" id="quizName" placeholder="Quiz Name" onkeydown="handleKeyDown(event, 'quizName')">
+    <ul id="generatedNames"></ul>
+
+    <script>
+        function generateActionNames(actionName) {
+            const prefixes = ['', 'desk_', 'mob_', 'ru_', 'ua_'];
+            let formattedActionName = actionName.replace(/[_\W]+/g, '_').toLowerCase();
+            formattedActionName = formattedActionName.replace(/^_+|_+$/g, ''); // удалить начальные и конечные подчёркивания
+            const generatedNamesList = document.getElementById('generatedNames');
+            generatedNamesList.innerHTML = '';
+
+            prefixes.forEach(prefix => {
+                const listItem = document.createElement('li');
+                listItem.textContent = prefix + formattedActionName;
+                generatedNamesList.appendChild(listItem);
+            });
+        }
+
+        function generateQuizNames(quizName) {
+            const prefixes = ['1_', '2_', '3_', 'ru_', 'ua_'];
+            let formattedQuizName = quizName.replace(/[_\W]+/g, '_').toLowerCase();
+            formattedQuizName = formattedQuizName.replace(/^_+|_+$/g, ''); // удалить начальные и конечные подчёркивания
+            const generatedNamesList = document.getElementById('generatedNames');
+            generatedNamesList.innerHTML = '';
+
+            const quizNameListItem = document.createElement('li');
+            quizNameListItem.textContent = formattedQuizName;
+            generatedNamesList.appendChild(quizNameListItem);
+
+            prefixes.forEach(prefix => {
+                const listItem = document.createElement('li');
+                listItem.textContent = prefix + formattedQuizName;
+                generatedNamesList.appendChild(listItem);
+            });
+        }
+
+        function handleKeyDown(event, field) {
+            if (event.key === 'Enter') {
+                const actionNameInput = document.getElementById('actionName');
+                const quizNameInput = document.getElementById('quizName');
+                if (field === 'actionName') {
+                    generateActionNames(actionNameInput.value);
+                } else if (field === 'quizName') {
+                    generateQuizNames(quizNameInput.value);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

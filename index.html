@@ -3,18 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Names Generator</title>
+<title>Picture Titles</title>
+<link rel="icon" type="image/png" href="img/picture_fav">
 <style type="text/css">
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+    }
+    input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+    ul {
+        list-style: none;
+        padding: 0;
+    }
     li {
         color: cornflowerblue;
+        cursor: pointer;
+        position: relative;
+        padding: 5px;
+        background: #fff;
+        margin: 5px 0;
+        border-radius: 4px;
+        transition: background 0.3s;
+        width: 100%;
+    }
+    li:hover {
+        background: #e0e0e0;
+    }
+    .copied-notification {
+        position: absolute;
+        top: 50%;
+        right: -60px;
+        transform: translateY(-50%);
+        background: lightgreen;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        display: none;
+    }
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+    .input-group button {
+        margin-left: 10px;
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #fff;
+    }
+    .input-group button:hover {
+        background-color: #e0e0e0;
     }
 </style>
 </head>
 <body>
-    <label for="actionName">1:</label>
-    <input type="text" id="actionName" placeholder="Promo Name" onkeydown="handleKeyDown(event, 'actionName')"><br>
-    <label for="quizName">2:</label>
-    <input style="margin-top: 20px;" type="text" id="quizName" placeholder="Quiz Name" onkeydown="handleKeyDown(event, 'quizName')">
+    <div class="input-group">
+        <input type="text" id="actionName" placeholder="Promo Name" onkeydown="handleKeyDown(event, 'actionName')">
+        <button onclick="triggerEnter('actionName')">✔️</button>
+    </div>
+    <div class="input-group">
+        <input type="text" id="quizName" placeholder="Quiz Name" onkeydown="handleKeyDown(event, 'quizName')">
+        <button onclick="triggerEnter('quizName')">✔️</button>
+    </div>
     <ul id="generatedNames"></ul>
 
     <script>
@@ -28,8 +94,10 @@
             prefixes.forEach(prefix => {
                 const listItem = document.createElement('li');
                 listItem.textContent = prefix + formattedActionName;
+                listItem.onclick = () => copyToClipboard(listItem);
                 generatedNamesList.appendChild(listItem);
             });
+            adjustLiWidths();
         }
 
         function generateQuizNames(quizName) {
@@ -41,25 +109,68 @@
 
             const quizNameListItem = document.createElement('li');
             quizNameListItem.textContent = formattedQuizName;
+            quizNameListItem.onclick = () => copyToClipboard(quizNameListItem);
             generatedNamesList.appendChild(quizNameListItem);
 
             prefixes.forEach(prefix => {
                 const listItem = document.createElement('li');
                 listItem.textContent = prefix + formattedQuizName;
+                listItem.onclick = () => copyToClipboard(listItem);
                 generatedNamesList.appendChild(listItem);
             });
+            adjustLiWidths();
         }
 
         function handleKeyDown(event, field) {
             if (event.key === 'Enter') {
-                const actionNameInput = document.getElementById('actionName');
-                const quizNameInput = document.getElementById('quizName');
                 if (field === 'actionName') {
-                    generateActionNames(actionNameInput.value);
+                    generateActionNames(document.getElementById('actionName').value);
                 } else if (field === 'quizName') {
-                    generateQuizNames(quizNameInput.value);
+                    generateQuizNames(document.getElementById('quizName').value);
                 }
             }
+        }
+
+        function triggerEnter(field) {
+            if (field === 'actionName') {
+                generateActionNames(document.getElementById('actionName').value);
+            } else if (field === 'quizName') {
+                generateQuizNames(document.getElementById('quizName').value);
+            }
+        }
+
+        function copyToClipboard(listItem) {
+            const textToCopy = listItem.childNodes[0].nodeValue; // Copy only the text content
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showCopiedNotification(listItem);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showCopiedNotification(listItem) {
+            let notification = listItem.querySelector('.copied-notification');
+            if (!notification) {
+                notification = document.createElement('span');
+                notification.className = 'copied-notification';
+                notification.textContent = 'copied';
+                listItem.appendChild(notification);
+            }
+            notification.style.display = 'inline';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 1000);
+        }
+
+        function adjustLiWidths() {
+            const listItems = document.querySelectorAll('#generatedNames li');
+            let maxWidth = 0;
+            listItems.forEach(item => {
+                maxWidth = Math.max(maxWidth, item.offsetWidth);
+            });
+            listItems.forEach(item => {
+                item.style.width = `${maxWidth}px`;
+            });
         }
     </script>
 </body>

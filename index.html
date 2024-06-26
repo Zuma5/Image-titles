@@ -85,14 +85,27 @@
             <input type="text" id="quizName" placeholder="Quiz Name" onkeydown="handleKeyDown(event, 'quizName')">
             <button onclick="triggerEnter('quizName')">✔️</button>
         </div>
+        <div class="input-group">
+            <input type="text" id="imageName" placeholder="Iframe Image" onkeydown="handleKeyDown(event, 'imageName')">
+            <button onclick="triggerEnter('imageName')">✔️</button>
+        </div>
     </div>
     <ul id="generatedNames"></ul>
 
     <script>
+        const suffixes = ['-ru', '-en', '-en-hi', '-en-bd', '-hi', '-bd', '-tr', '-az', '-kz', '-uz', '-es-pe', '-es-cl', '-es-mx', '-br', '-pt'];
+
+        function formatNameForActionAndQuiz(name) {
+            return name.replace(/[_\W]+/g, '_').toLowerCase().replace(/^_+|_+$/g, ''); // удалить начальные и конечные подчёркивания
+        }
+
+        function formatNameForImage(name) {
+            return name.toLowerCase().replace(/[\W]+/g, '-').replace(/^-+|-+$/g, ''); // удалить начальные и конечные тире
+        }
+
         function generateActionNames(actionName) {
             const prefixes = ['', 'desk_', 'mob_', 'ru_', 'ua_'];
-            let formattedActionName = actionName.replace(/[_\W]+/g, '_').toLowerCase();
-            formattedActionName = formattedActionName.replace(/^_+|_+$/g, ''); // удалить начальные и конечные подчёркивания
+            let formattedActionName = formatNameForActionAndQuiz(actionName);
             const generatedNamesList = document.getElementById('generatedNames');
             generatedNamesList.innerHTML = '';
 
@@ -107,19 +120,27 @@
 
         function generateQuizNames(quizName) {
             const prefixes = ['1_', '2_', '3_', 'ru_', 'ua_'];
-            let formattedQuizName = quizName.replace(/[_\W]+/g, '_').toLowerCase();
-            formattedQuizName = formattedQuizName.replace(/^_+|_+$/g, ''); // удалить начальные и конечные подчёркивания
+            let formattedQuizName = formatNameForActionAndQuiz(quizName);
             const generatedNamesList = document.getElementById('generatedNames');
             generatedNamesList.innerHTML = '';
-
-            const quizNameListItem = document.createElement('li');
-            quizNameListItem.textContent = formattedQuizName;
-            quizNameListItem.onclick = () => copyToClipboard(quizNameListItem);
-            generatedNamesList.appendChild(quizNameListItem);
 
             prefixes.forEach(prefix => {
                 const listItem = document.createElement('li');
                 listItem.textContent = prefix + formattedQuizName;
+                listItem.onclick = () => copyToClipboard(listItem);
+                generatedNamesList.appendChild(listItem);
+            });
+            adjustLiWidths();
+        }
+
+        function generateImageNames(imageName) {
+            let formattedImageName = formatNameForImage(imageName);
+            const generatedNamesList = document.getElementById('generatedNames');
+            generatedNamesList.innerHTML = '';
+
+            suffixes.forEach(suffix => {
+                const listItem = document.createElement('li');
+                listItem.textContent = formattedImageName + suffix;
                 listItem.onclick = () => copyToClipboard(listItem);
                 generatedNamesList.appendChild(listItem);
             });
@@ -132,6 +153,8 @@
                     generateActionNames(document.getElementById('actionName').value);
                 } else if (field === 'quizName') {
                     generateQuizNames(document.getElementById('quizName').value);
+                } else if (field === 'imageName') {
+                    generateImageNames(document.getElementById('imageName').value);
                 }
             }
         }
@@ -141,6 +164,8 @@
                 generateActionNames(document.getElementById('actionName').value);
             } else if (field === 'quizName') {
                 generateQuizNames(document.getElementById('quizName').value);
+            } else if (field === 'imageName') {
+                generateImageNames(document.getElementById('imageName').value);
             }
         }
 
